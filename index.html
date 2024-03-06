@@ -48,12 +48,10 @@
     <div id="price-info"></div>
     <div id="chart-container">
         <canvas id="lineChart" width="800" height="200"></canvas>
-        <canvas id="barChart" width="800" height="200"></canvas>
     </div>
     
     <script>
         var lineCtx = document.getElementById('lineChart').getContext('2d');
-        var barCtx = document.getElementById('barChart').getContext('2d');
         var priceInfo = document.getElementById('price-info');
 
         var lineChart = new Chart(lineCtx, {
@@ -74,12 +72,16 @@
                         display: false
                     }],
                     yAxes: [{
-                        display: false
+                        display: false,
+                        ticks: {
+                            suggestedMin: 0,
+                            suggestedMax: 50000 // Ajuste conforme necessário
+                        }
                     }]
                 },
                 elements: {
                     line: {
-                        tension: 0
+                        tension: 0 // Desativa a curvatura da linha
                     }
                 },
                 legend: {
@@ -88,39 +90,8 @@
             }
         });
 
-        var barChart = new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Preço do Bitcoin (BRL)',
-                    data: [],
-                    backgroundColor: 'rgba(0, 255, 0, 0.5)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    xAxes: [{
-                        display: false
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                },
-                legend: {
-                    display: false
-                }
-            }
-        });
-
         function updateCharts() {
-            var nineHoursAgo = new Date();
-            nineHoursAgo.setHours(nineHoursAgo.getHours() - 9);
-
-            fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&from=' + nineHoursAgo.getTime() + '&to=' + new Date().getTime())
+            fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&days=1')
             .then(response => response.json())
             .then(data => {
                 var prices = data.prices.map(price => {
@@ -150,11 +121,8 @@
                 // Atualizar dados nos gráficos
                 lineChart.data.datasets[0].data = prices.map(price => price.y);
                 lineChart.data.labels = prices.map(price => new Date(price.x).toLocaleTimeString());
-                barChart.data.datasets[0].data = prices.map(price => price.y);
-                barChart.data.labels = prices.map(price => new Date(price.x).toLocaleTimeString());
                 
                 lineChart.update();
-                barChart.update();
             })
             .catch(error => console.error('Erro ao buscar dados:', error));
         }
