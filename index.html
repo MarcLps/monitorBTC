@@ -39,7 +39,7 @@
 
         #chart-container {
             width: 100%;
-            max-width: 1200px; /* Largura máxima do contêiner do gráfico */
+            max-width: 1000px; /* Largura máxima do contêiner do gráfico */
             overflow-x: auto; /* Adiciona uma barra de rolagem horizontal se o gráfico for muito largo */
         }
     </style>
@@ -47,7 +47,7 @@
 <body>
     <div id="price-info"></div>
     <div id="chart-container">
-        <canvas id="lineChart" width="1200" height="300"></canvas>
+        <canvas id="lineChart" width="800" height="200"></canvas>
     </div>
     
     <script>
@@ -71,24 +71,23 @@
                     xAxes: [{
                         type: 'time',
                         time: {
-                            unit: 'hour', // exibe rótulos por hora
                             displayFormats: {
-                                hour: 'HH:mm' // formato de exibição da hora
+                                hour: 'HH:mm'
                             }
                         },
                         ticks: {
-                            maxTicksLimit: 20 // limite máximo de rótulos no eixo X
+                            maxTicksLimit: 10 // Limita o número de rótulos no eixo X
                         }
                     }],
                     yAxes: [{
                         ticks: {
-                            suggestedMin: 0 // valor mínimo sugerido para o eixo Y
+                            suggestedMin: 0
                         }
                     }]
                 },
                 elements: {
                     line: {
-                        tension: 0 // desativa a curvatura da linha
+                        tension: 0
                     }
                 },
                 legend: {
