@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+        }
+
+        #alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            border-radius: 5px;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bitcoinChart" width="600" height="300"></canvas>
+    <div id="alert"></div>
+    <script>
+        // Função para desenhar o gráfico
+        function drawChart() {
+            var canvas = document.getElementById('bitcoinChart');
+            var ctx = canvas.getContext('2d');
+
+            // Aqui você pode implementar a lógica para buscar os dados do Bitcoin e desenhar o gráfico
+            // Por enquanto, vamos apenas desenhar um retângulo cinza no centro do canvas
+            ctx.fillStyle = '#ccc';
+            ctx.fillRect(50, 50, 500, 200);
+        }
+
+        // Atualizar o gráfico a cada 5 segundos
+        setInterval(drawChart, 5000);
+
+        // Função para exibir alerta na tela
+        function showAlert(message) {
+            var alertBox = document.getElementById('alert');
+            alertBox.innerText = message;
+            alertBox.style.display = 'block';
+
+            setTimeout(function() {
+                alertBox.style.display = 'none';
+            }, 20000); // Alerta some após 20 segundos
+        }
+
+        // Exemplo de chamada da função showAlert quando o preço sobe
+        // Você precisa implementar a lógica para verificar se o preço subiu ou desceu
+        // Neste exemplo, estamos chamando showAlert aleatoriamente após 5 segundos
+        setTimeout(function() {
+            showAlert('O preço do Bitcoin subiu!');
+        }, 5000);
+    </script>
+</body>
+</html>
