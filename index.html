@@ -26,7 +26,6 @@
         #price-info {
             font-size: 24px;
             margin-bottom: 20px;
-            color: #4CAF50;
         }
 
         .arrow-up {
@@ -126,12 +125,11 @@
                 // Atualizar informações de preço na tela
                 priceInfo.innerHTML = currentPrice + ' BRL ';
                 if (priceChange > 0) {
-                    priceInfo.innerHTML += '+';
-                    priceInfo.innerHTML += (currentPrice - previousPrice).toFixed(2) + ' (↑)';
+                    priceInfo.innerHTML += '<span class="arrow-up">&#x25B2;</span>';
                 } else if (priceChange < 0) {
-                    priceInfo.innerHTML += (currentPrice - previousPrice).toFixed(2) + ' (↓)';
+                    priceInfo.innerHTML += '<span class="arrow-down">&#x25BC;</span>';
                 } else {
-                    priceInfo.innerHTML += ' (→)';
+                    priceInfo.innerHTML += ' &#x25B2;&#x25BC;';
                 }
 
                 // Atualizar dados nos gráficos
