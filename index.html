@@ -29,6 +29,11 @@
             color: #fff;
         }
 
+        #btc-value-info {
+            font-size: 18px;
+            color: #87CEFA; /* Cor azul celeste */
+        }
+
         .arrow-up {
             color: #4CAF50;
         }
@@ -46,6 +51,7 @@
 </head>
 <body>
     <div id="price-info"></div>
+    <div id="btc-value-info"></div>
     <div id="chart-container">
         <canvas id="lineChart" width="800" height="200"></canvas>
     </div>
@@ -53,6 +59,7 @@
     <script>
         var lineCtx = document.getElementById('lineChart').getContext('2d');
         var priceInfo = document.getElementById('price-info');
+        var btcValueInfo = document.getElementById('btc-value-info');
 
         var lineChart = new Chart(lineCtx, {
             type: 'line',
@@ -117,6 +124,10 @@
                     priceInfo.innerHTML += ' &#x25B2;&#x25BC;';
                     priceInfo.style.color = '#fff';
                 }
+
+                // Calcula o valor de 0,00172003 BTC em reais
+                var btcValueInBRL = (0.00172003 * currentPrice).toFixed(2);
+                btcValueInfo.innerHTML = '0.00172003 BTC: R$ ' + btcValueInBRL;
 
                 // Atualizar dados nos gráficos
                 lineChart.data.datasets[0].data = prices.map(price => price.y);
