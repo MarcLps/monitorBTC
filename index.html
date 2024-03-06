@@ -27,18 +27,14 @@
             font-size: 32px;
             margin-bottom: 20px;
             color: #fff;
-            display: flex;
-            align-items: center;
         }
 
         .arrow-up {
             color: #4CAF50;
-            margin-left: 10px;
         }
 
         .arrow-down {
             color: #f44336;
-            margin-left: 10px;
         }
 
         #chart-container {
@@ -49,18 +45,14 @@
     </style>
 </head>
 <body>
-    <div id="price-info">
-        <div id="current-price"></div>
-        <div id="price-change"></div>
-    </div>
+    <div id="price-info"></div>
     <div id="chart-container">
         <canvas id="lineChart" width="1200" height="300"></canvas>
     </div>
     
     <script>
         var lineCtx = document.getElementById('lineChart').getContext('2d');
-        var currentPriceElem = document.getElementById('current-price');
-        var priceChangeElem = document.getElementById('price-change');
+        var priceInfo = document.getElementById('price-info');
 
         var lineChart = new Chart(lineCtx, {
             type: 'line',
@@ -124,16 +116,16 @@
                 var priceChange = currentPrice - previousPrice;
 
                 // Atualizar informações de preço na tela
-                currentPriceElem.innerHTML = currentPrice + ' BRL ';
+                priceInfo.innerHTML = currentPrice + ' BRL ';
                 if (priceChange > 0) {
-                    priceChangeElem.innerHTML = '+ ' + priceChange.toFixed(2) + ' (↑)';
-                    priceChangeElem.style.color = '#4CAF50';
+                    priceInfo.innerHTML += '<span class="arrow-up">&#x25B2;</span>';
+                    priceInfo.style.color = '#4CAF50';
                 } else if (priceChange < 0) {
-                    priceChangeElem.innerHTML = '- ' + Math.abs(priceChange).toFixed(2) + ' (↓)';
-                    priceChangeElem.style.color = '#f44336';
+                    priceInfo.innerHTML += '<span class="arrow-down">&#x25BC;</span>';
+                    priceInfo.style.color = '#f44336';
                 } else {
-                    priceChangeElem.innerHTML = ' (↕)';
-                    priceChangeElem.style.color = '#fff';
+                    priceInfo.innerHTML += ' &#x25B2;&#x25BC;';
+                    priceInfo.style.color = '#fff';
                 }
 
                 // Atualizar dados nos gráficos
