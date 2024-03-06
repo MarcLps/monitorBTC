@@ -24,8 +24,17 @@
         }
 
         #price-info {
-            font-size: 18px;
+            font-size: 24px;
             margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        .arrow-up {
+            color: #4CAF50;
+        }
+
+        .arrow-down {
+            color: #f44336;
         }
     </style>
 </head>
@@ -115,13 +124,13 @@
                 var priceChange = currentPrice - previousPrice;
 
                 // Atualizar informações de preço na tela
-                priceInfo.innerHTML = 'Preço atual do Bitcoin: ' + currentPrice + ' BRL';
+                priceInfo.innerHTML = 'Preço atual do Bitcoin: <span style="font-size: 32px;">' + currentPrice + '</span> BRL ';
                 if (priceChange > 0) {
-                    priceInfo.innerHTML += ' (+' + priceChange.toFixed(2) + ' ↑)';
+                    priceInfo.innerHTML += '<span class="arrow-up">&#x25B2;</span>';
                 } else if (priceChange < 0) {
-                    priceInfo.innerHTML += ' (' + priceChange.toFixed(2) + ' ↓)';
+                    priceInfo.innerHTML += '<span class="arrow-down">&#x25BC;</span>';
                 } else {
-                    priceInfo.innerHTML += ' (→)';
+                    priceInfo.innerHTML += ' &#x25B2;&#x25BC;';
                 }
 
                 // Atualizar dados nos gráficos
