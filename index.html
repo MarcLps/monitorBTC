@@ -24,8 +24,9 @@
         }
 
         #price-info {
-            font-size: 24px;
+            font-size: 32px;
             margin-bottom: 20px;
+            color: #fff;
         }
 
         .arrow-up {
@@ -39,8 +40,10 @@
 </head>
 <body>
     <div id="price-info"></div>
-    <canvas id="lineChart" width="800" height="200"></canvas>
-    <canvas id="barChart" width="800" height="200"></canvas>
+    <div id="chart-container">
+        <canvas id="lineChart" width="800" height="200"></canvas>
+        <canvas id="barChart" width="800" height="200"></canvas>
+    </div>
     
     <script>
         var lineCtx = document.getElementById('lineChart').getContext('2d');
@@ -126,10 +129,13 @@
                 priceInfo.innerHTML = currentPrice + ' BRL ';
                 if (priceChange > 0) {
                     priceInfo.innerHTML += '<span class="arrow-up">&#x25B2;</span>';
+                    priceInfo.style.color = '#4CAF50';
                 } else if (priceChange < 0) {
                     priceInfo.innerHTML += '<span class="arrow-down">&#x25BC;</span>';
+                    priceInfo.style.color = '#f44336';
                 } else {
                     priceInfo.innerHTML += ' &#x25B2;&#x25BC;';
+                    priceInfo.style.color = '#fff';
                 }
 
                 // Atualizar dados nos gráficos
