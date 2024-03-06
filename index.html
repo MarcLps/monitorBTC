@@ -11,8 +11,9 @@
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             background-color: #000;
             color: #fff;
@@ -23,61 +24,82 @@
         }
 
         #price-info {
-            position: absolute;
-            top: 20px;
-            left: 20px;
             font-size: 18px;
-        }
-
-        #arrow-up {
-            color: #4CAF50;
-        }
-
-        #arrow-down {
-            color: #f44336;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div id="price-info"></div>
-    <canvas id="bitcoinChart" width="800" height="400"></canvas>
+    <canvas id="lineChart" width="800" height="200"></canvas>
+    <canvas id="barChart" width="800" height="200"></canvas>
     
     <script>
-        var ctx = document.getElementById('bitcoinChart').getContext('2d');
+        var lineCtx = document.getElementById('lineChart').getContext('2d');
+        var barCtx = document.getElementById('barChart').getContext('2d');
         var priceInfo = document.getElementById('price-info');
 
-        var chart = new Chart(ctx, {
+        var lineChart = new Chart(lineCtx, {
             type: 'line',
             data: {
                 labels: [],
                 datasets: [{
                     label: 'Preço do Bitcoin (BRL)',
                     data: [],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderColor: '#00FF00',
+                    backgroundColor: 'rgba(0, 255, 0, 0.2)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        display: false
+                    }],
+                    yAxes: [{
+                        display: false
+                    }]
+                },
+                elements: {
+                    line: {
+                        tension: 0
+                    }
+                },
+                legend: {
+                    display: false
+                }
+            }
+        });
+
+        var barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Preço do Bitcoin (BRL)',
+                    data: [],
+                    backgroundColor: 'rgba(0, 255, 0, 0.5)',
                     borderWidth: 1
                 }]
             },
             options: {
                 scales: {
                     xAxes: [{
-                        type: 'time',
-                        time: {
-                            unit: 'minute'
-                        }
+                        display: false
                     }],
                     yAxes: [{
                         ticks: {
-                            callback: function(value, index, values) {
-                                return value.toFixed(2) + ' BRL';
-                            }
+                            beginAtZero: true
                         }
                     }]
+                },
+                legend: {
+                    display: false
                 }
             }
         });
 
-        function updateChart() {
+        function updateCharts() {
             fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&days=1')
             .then(response => response.json())
             .then(data => {
@@ -90,26 +112,32 @@
 
                 var currentPrice = prices[prices.length - 1].y.toFixed(2);
                 var previousPrice = prices[prices.length - 2].y.toFixed(2);
+                var priceChange = currentPrice - previousPrice;
 
                 // Atualizar informações de preço na tela
-                priceInfo.innerHTML = currentPrice + ' BRL ';
-                if (currentPrice > previousPrice) {
-                    priceInfo.innerHTML += '+';
-                    priceInfo.innerHTML += (currentPrice - previousPrice).toFixed(2) + ' (↑)';
-                } else if (currentPrice < previousPrice) {
-                    priceInfo.innerHTML += (currentPrice - previousPrice).toFixed(2) + ' (↓)';
+                priceInfo.innerHTML = 'Preço atual do Bitcoin: ' + currentPrice + ' BRL';
+                if (priceChange > 0) {
+                    priceInfo.innerHTML += ' (+' + priceChange.toFixed(2) + ' ↑)';
+                } else if (priceChange < 0) {
+                    priceInfo.innerHTML += ' (' + priceChange.toFixed(2) + ' ↓)';
                 } else {
-                    priceInfo.innerHTML += '0 (→)';
+                    priceInfo.innerHTML += ' (→)';
                 }
 
-                chart.data.datasets[0].data = prices;
-                chart.update();
+                // Atualizar dados nos gráficos
+                lineChart.data.datasets[0].data = prices.map(price => price.y);
+                lineChart.data.labels = prices.map(price => new Date(price.x).toLocaleTimeString());
+                barChart.data.datasets[0].data = prices.map(price => price.y);
+                barChart.data.labels = prices.map(price => new Date(price.x).toLocaleTimeString());
+                
+                lineChart.update();
+                barChart.update();
             })
             .catch(error => console.error('Erro ao buscar dados:', error));
         }
 
-        updateChart();
-        setInterval(updateChart, 5000); // Atualizar a cada 5 segundos
+        updateCharts();
+        setInterval(updateCharts, 5000); // Atualizar a cada 5 segundos
     </script>
 </body>
 </html>
