@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bitcoin Monitor</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.1.1/chartjs-plugin-zoom.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -72,32 +71,15 @@
             options: {
                 scales: {
                     xAxes: [{
-                        display: true,
-                        type: 'time',
-                        distribution: 'linear',
-                        ticks: {
-                            source: 'auto'
-                        }
+                        display: false
                     }],
                     yAxes: [{
-                        display: true
+                        display: false
                     }]
                 },
                 elements: {
                     line: {
                         tension: 0
-                    }
-                },
-                plugins: {
-                    zoom: {
-                        pan: {
-                            enabled: true,
-                            mode: 'xy'
-                        },
-                        zoom: {
-                            enabled: true,
-                            mode: 'xy'
-                        }
                     }
                 },
                 legend: {
@@ -120,28 +102,13 @@
             options: {
                 scales: {
                     xAxes: [{
-                        display: true,
-                        type: 'time',
-                        distribution: 'linear',
-                        ticks: {
-                            source: 'auto'
-                        }
+                        display: false
                     }],
                     yAxes: [{
-                        display: true
-                    }]
-                },
-                plugins: {
-                    zoom: {
-                        pan: {
-                            enabled: true,
-                            mode: 'xy'
-                        },
-                        zoom: {
-                            enabled: true,
-                            mode: 'xy'
+                        ticks: {
+                            beginAtZero: true
                         }
-                    }
+                    }]
                 },
                 legend: {
                     display: false
@@ -178,9 +145,12 @@
                 }
 
                 // Atualizar dados nos gráficos
-                lineChart.data.datasets[0].data = prices;
+                lineChart.data.datasets[0].data = prices.map(price => price.y);
+                lineChart.data.labels = prices.map(price => new Date(price.x).toLocaleTimeString());
+                barChart.data.datasets[0].data = prices.map(price => price.y);
+                barChart.data.labels = prices.map(price => new Date(price.x).toLocaleTimeString());
+                
                 lineChart.update();
-                barChart.data.datasets[0].data = prices;
                 barChart.update();
             })
             .catch(error => console.error('Erro ao buscar dados:', error));
