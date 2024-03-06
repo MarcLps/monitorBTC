@@ -15,41 +15,37 @@
             align-items: center;
             height: 100vh;
             background-color: #000;
+            color: #fff;
         }
 
         canvas {
             border: 1px solid #333;
         }
 
-        #alert {
-            display: none;
-            position: fixed;
+        #price-info {
+            position: absolute;
             top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            border-radius: 5px;
-            color: #fff;
-            z-index: 999;
+            left: 20px;
+            font-size: 18px;
         }
 
-        .green {
-            background-color: #4CAF50;
+        #arrow-up {
+            color: #4CAF50;
         }
 
-        .red {
-            background-color: #f44336;
+        #arrow-down {
+            color: #f44336;
         }
     </style>
 </head>
 <body>
+    <div id="price-info"></div>
     <canvas id="bitcoinChart" width="800" height="400"></canvas>
-    <div id="alert"></div>
     
     <script>
         var ctx = document.getElementById('bitcoinChart').getContext('2d');
+        var priceInfo = document.getElementById('price-info');
 
-        // Criar o gráfico
         var chart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -67,14 +63,20 @@
                     xAxes: [{
                         type: 'time',
                         time: {
-                            unit: 'hour'
+                            unit: 'minute'
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return value.toFixed(2) + ' BRL';
+                            }
                         }
                     }]
                 }
             }
         });
 
-        // Atualizar o gráfico a cada 10 segundos
         function updateChart() {
             fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&days=1')
             .then(response => response.json())
@@ -86,6 +88,20 @@
                     };
                 });
 
+                var currentPrice = prices[prices.length - 1].y.toFixed(2);
+                var previousPrice = prices[prices.length - 2].y.toFixed(2);
+
+                // Atualizar informações de preço na tela
+                priceInfo.innerHTML = currentPrice + ' BRL ';
+                if (currentPrice > previousPrice) {
+                    priceInfo.innerHTML += '+';
+                    priceInfo.innerHTML += (currentPrice - previousPrice).toFixed(2) + ' (↑)';
+                } else if (currentPrice < previousPrice) {
+                    priceInfo.innerHTML += (currentPrice - previousPrice).toFixed(2) + ' (↓)';
+                } else {
+                    priceInfo.innerHTML += '0 (→)';
+                }
+
                 chart.data.datasets[0].data = prices;
                 chart.update();
             })
@@ -93,7 +109,7 @@
         }
 
         updateChart();
-        setInterval(updateChart, 10000); // Atualizar a cada 10 segundos
+        setInterval(updateChart, 5000); // Atualizar a cada 5 segundos
     </script>
 </body>
 </html>
