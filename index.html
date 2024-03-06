@@ -117,7 +117,10 @@
         });
 
         function updateCharts() {
-            fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&days=1')
+            var nineHoursAgo = new Date();
+            nineHoursAgo.setHours(nineHoursAgo.getHours() - 9);
+
+            fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&from=' + nineHoursAgo.getTime() + '&to=' + new Date().getTime())
             .then(response => response.json())
             .then(data => {
                 var prices = data.prices.map(price => {
