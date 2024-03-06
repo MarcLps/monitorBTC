@@ -10,14 +10,14 @@
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
             background-color: #f5f5f5;
         }
 
         canvas {
             border: 1px solid #ccc;
+            margin-top: 20px;
         }
 
         #alert {
@@ -35,40 +35,68 @@
     </style>
 </head>
 <body>
+    <div id="currentPrice"></div>
     <canvas id="bitcoinChart" width="600" height="300"></canvas>
     <div id="alert"></div>
+
     <script>
         // Função para desenhar o gráfico
-        function drawChart() {
+        function drawChart(data) {
             var canvas = document.getElementById('bitcoinChart');
             var ctx = canvas.getContext('2d');
+            var prices = data.prices;
+            var width = canvas.width;
+            var height = canvas.height;
 
-            // Aqui você pode implementar a lógica para buscar os dados do Bitcoin e desenhar o gráfico
-            // Por enquanto, vamos apenas desenhar um retângulo cinza no centro do canvas
-            ctx.fillStyle = '#ccc';
-            ctx.fillRect(50, 50, 500, 200);
+            ctx.clearRect(0, 0, width, height);
+
+            // Desenhar eixo y
+            ctx.beginPath();
+            ctx.moveTo(50, 20);
+            ctx.lineTo(50, height - 20);
+            ctx.stroke();
+
+            // Desenhar eixo x
+            ctx.beginPath();
+            ctx.moveTo(50, height - 20);
+            ctx.lineTo(width - 20, height - 20);
+            ctx.stroke();
+
+            // Desenhar linha do gráfico
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (var i = 0; i < prices.length; i++) {
+                var x = (width - 70) / (prices.length - 1) * i + 50;
+                var y = height - 20 - ((prices[i] - data.minPrice) / (data.maxPrice - data.minPrice) * (height - 40));
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+
+            // Exibir os valores atuais na tela
+            var currentPriceDiv = document.getElementById('currentPrice');
+            currentPriceDiv.innerHTML = 'Valor atual do Bitcoin: R$ ' + prices[prices.length - 1];
         }
 
         // Atualizar o gráfico a cada 5 segundos
-        setInterval(drawChart, 5000);
-
-        // Função para exibir alerta na tela
-        function showAlert(message) {
-            var alertBox = document.getElementById('alert');
-            alertBox.innerText = message;
-            alertBox.style.display = 'block';
-
-            setTimeout(function() {
-                alertBox.style.display = 'none';
-            }, 20000); // Alerta some após 20 segundos
+        function updateChart() {
+            fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1')
+            .then(response => response.json())
+            .then(data => {
+                var prices = data.prices.map(price => price[1]);
+                var minPrice = Math.min(...prices);
+                var maxPrice = Math.max(...prices);
+                drawChart({prices, minPrice, maxPrice});
+            })
+            .catch(error => console.error('Erro ao buscar dados:', error));
         }
 
-        // Exemplo de chamada da função showAlert quando o preço sobe
-        // Você precisa implementar a lógica para verificar se o preço subiu ou desceu
-        // Neste exemplo, estamos chamando showAlert aleatoriamente após 5 segundos
-        setTimeout(function() {
-            showAlert('O preço do Bitcoin subiu!');
-        }, 5000);
+        updateChart();
+        setInterval(updateChart, 5000); // Atualizar a cada 5 segundos
     </script>
 </body>
 </html>
