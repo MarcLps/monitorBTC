@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bitcoin Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,80 +47,47 @@
     <div id="alert"></div>
     
     <script>
-        var canvas = document.getElementById('bitcoinChart');
-        var ctx = canvas.getContext('2d');
+        var ctx = document.getElementById('bitcoinChart').getContext('2d');
 
-        // Função para desenhar o gráfico
-        function drawChart(data) {
-            var prices = data.prices;
-            var width = canvas.width;
-            var height = canvas.height;
-            var maxPrice = Math.max(...prices);
-            var minPrice = Math.min(...prices);
-            var priceDiff = maxPrice - minPrice;
-            var priceRange = 0.1 * priceDiff;
-
-            ctx.clearRect(0, 0, width, height);
-
-            // Desenhar eixo y
-            ctx.beginPath();
-            ctx.moveTo(50, 20);
-            ctx.lineTo(50, height - 20);
-            ctx.strokeStyle = '#666';
-            ctx.stroke();
-
-            // Desenhar eixo x
-            ctx.beginPath();
-            ctx.moveTo(50, height - 20);
-            ctx.lineTo(width - 20, height - 20);
-            ctx.stroke();
-
-            // Desenhar linha do gráfico
-            ctx.strokeStyle = '#0f0';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            for (var i = 0; i < prices.length; i++) {
-                var x = (width - 70) / (prices.length - 1) * i + 50;
-                var y = height - 20 - ((prices[i] - minPrice - priceRange * 0.05) / (priceRange * 1.1) * (height - 40));
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
+        // Criar o gráfico
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Preço do Bitcoin (BRL)',
+                    data: [],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            unit: 'hour'
+                        }
+                    }]
                 }
             }
-            ctx.stroke();
-
-            // Exibir o preço atual na tela
-            var currentPrice = prices[prices.length - 1].toFixed(2);
-            var currentPriceDiv = document.getElementById('alert');
-            currentPriceDiv.innerHTML = 'Preço atual do Bitcoin: R$ ' + currentPrice;
-
-            // Verificar se o preço subiu ou desceu
-            var previousPrice = prices[prices.length - 2];
-            var priceChange = currentPrice - previousPrice;
-            var alertDiv = document.getElementById('alert');
-            if (priceChange > 0) {
-                alertDiv.className = 'green';
-                alertDiv.innerHTML += ' (+' + priceChange.toFixed(2) + ')';
-            } else if (priceChange < 0) {
-                alertDiv.className = 'red';
-                alertDiv.innerHTML += ' (' + priceChange.toFixed(2) + ')';
-            }
-
-            // Exibir o alerta por 20 segundos e depois ocultá-lo
-            alertDiv.style.display = 'block';
-            setTimeout(function() {
-                alertDiv.style.display = 'none';
-            }, 20000);
-        }
+        });
 
         // Atualizar o gráfico a cada 10 segundos
         function updateChart() {
             fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&days=1')
             .then(response => response.json())
             .then(data => {
-                var prices = data.prices.map(price => price[1]);
-                drawChart({prices});
+                var prices = data.prices.map(price => {
+                    return {
+                        x: new Date(price[0]),
+                        y: price[1]
+                    };
+                });
+
+                chart.data.datasets[0].data = prices;
+                chart.update();
             })
             .catch(error => console.error('Erro ao buscar dados:', error));
         }
