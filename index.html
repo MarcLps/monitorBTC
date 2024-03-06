@@ -69,25 +69,19 @@
             options: {
                 scales: {
                     xAxes: [{
-                        type: 'time',
-                        time: {
-                            displayFormats: {
-                                hour: 'HH:mm'
-                            }
-                        },
-                        ticks: {
-                            maxTicksLimit: 10 // Limita o número de rótulos no eixo X
-                        }
+                        display: false
                     }],
                     yAxes: [{
+                        display: false,
                         ticks: {
-                            suggestedMin: 0
+                            suggestedMin: 0,
+                            suggestedMax: 50000 // Ajuste conforme necessário
                         }
                     }]
                 },
                 elements: {
                     line: {
-                        tension: 0
+                        tension: 0 // Desativa a curvatura da linha
                     }
                 },
                 legend: {
@@ -97,10 +91,7 @@
         });
 
         function updateCharts() {
-            var tenHoursAgo = new Date();
-            tenHoursAgo.setHours(tenHoursAgo.getHours() - 10);
-
-            fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&from=' + tenHoursAgo.getTime() + '&to=' + new Date().getTime())
+            fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&days=1')
             .then(response => response.json())
             .then(data => {
                 var prices = data.prices.map(price => {
@@ -128,7 +119,8 @@
                 }
 
                 // Atualizar dados nos gráficos
-                lineChart.data.datasets[0].data = prices.map(price => price);
+                lineChart.data.datasets[0].data = prices.map(price => price.y);
+                lineChart.data.labels = prices.map(price => new Date(price.x).toLocaleTimeString());
                 
                 lineChart.update();
             })
