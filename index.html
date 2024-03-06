@@ -39,7 +39,7 @@
 
         #chart-container {
             width: 100%;
-            max-width: 1000px; /* Largura máxima do contêiner do gráfico */
+            max-width: 1200px; /* Largura máxima do contêiner do gráfico */
             overflow-x: auto; /* Adiciona uma barra de rolagem horizontal se o gráfico for muito largo */
         }
     </style>
@@ -47,7 +47,7 @@
 <body>
     <div id="price-info"></div>
     <div id="chart-container">
-        <canvas id="lineChart" width="800" height="200"></canvas>
+        <canvas id="lineChart" width="1200" height="300"></canvas>
     </div>
     
     <script>
@@ -69,19 +69,26 @@
             options: {
                 scales: {
                     xAxes: [{
-                        display: false
+                        type: 'time',
+                        time: {
+                            unit: 'hour', // exibe rótulos por hora
+                            displayFormats: {
+                                hour: 'HH:mm' // formato de exibição da hora
+                            }
+                        },
+                        ticks: {
+                            maxTicksLimit: 20 // limite máximo de rótulos no eixo X
+                        }
                     }],
                     yAxes: [{
-                        display: false,
                         ticks: {
-                            suggestedMin: 0,
-                            suggestedMax: 50000 // Ajuste conforme necessário
+                            suggestedMin: 0 // valor mínimo sugerido para o eixo Y
                         }
                     }]
                 },
                 elements: {
                     line: {
-                        tension: 0 // Desativa a curvatura da linha
+                        tension: 0 // desativa a curvatura da linha
                     }
                 },
                 legend: {
@@ -91,7 +98,10 @@
         });
 
         function updateCharts() {
-            fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&days=1')
+            var tenHoursAgo = new Date();
+            tenHoursAgo.setHours(tenHoursAgo.getHours() - 10);
+
+            fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=brl&from=' + tenHoursAgo.getTime() + '&to=' + new Date().getTime())
             .then(response => response.json())
             .then(data => {
                 var prices = data.prices.map(price => {
@@ -119,8 +129,7 @@
                 }
 
                 // Atualizar dados nos gráficos
-                lineChart.data.datasets[0].data = prices.map(price => price.y);
-                lineChart.data.labels = prices.map(price => new Date(price.x).toLocaleTimeString());
+                lineChart.data.datasets[0].data = prices.map(price => price);
                 
                 lineChart.update();
             })
